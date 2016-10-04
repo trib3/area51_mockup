@@ -1,6 +1,6 @@
 {
-  "name": "area51 mockup",
-  "version": "0.1",
+  "name": "area51-mockup",
+  "version": "0.1.0",
   "description": "play around with a51",
   "main": "dist/ag-grid-react-example.js",
   "scripts": {
