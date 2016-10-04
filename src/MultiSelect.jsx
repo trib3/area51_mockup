@@ -9,12 +9,11 @@ export default class MultiSelect extends React.Component {
       super();
 
       this.state = {
-        value: []
+        value: ''
       }
   }
 
   handleSelectChange (value) {
-		console.log('CHILD You\'ve selected:', value);
 		this.setState({ value });
 		this.props.updateBrands(value.split(','))
 	}
