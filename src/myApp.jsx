@@ -1,8 +1,10 @@
 import ReactDOM from 'react-dom';
 import React from 'react';
-import MyDataFactory from './MyDataFactory';
+import MyDataFactory from './data/MyDataFactory';
 import MultiSelect from './MultiSelect.jsx'
-import BrandGrid from './grids/BrandGrid.jsx'
+import BaseGrid from './grids/BaseGrid.jsx'
+import AmbassadorGrid from './grids/AmbassadorGrid.jsx'
+import RowDataFactory from './data/RowDataFactory.js';
 
 import _ from 'underscore';
 
@@ -13,44 +15,58 @@ export default class MyApp extends React.Component {
     constructor() {
         super();
 
-        //this.data =
+        this.dimensions = {
+          'brand': {
+            'options': [
+                  { label: 'Brand X', value: 'brand x'},
+                  { label: 'Brand Y', value: 'brand y'},
+                  { label: 'Brand Z', value: 'brand z'}
+                ],
+            'update': this.updateBrands.bind(this),
+            'columnDefs':[
+              {headerName: 'brand', field: 'brand', width: 100},
+              {headerName: 'emv', field: 'emv', width: 150, cellRenderer: BaseGrid.emvRenderer}
+            ]
+          },
+          'ambassador': {
+            'options':[
+                  { label: 'Amy Zee', value: 'Amy Zee'},
+                  { label: 'Baby Yak', value: 'Baby Yak'},
+                  { label: 'Chili X', value: 'Chili X'},
+                  { label: 'Dingo Why', value :'Dingo Why'},
+                  { label: 'Ermie V', value :'Ermie V'}
+                ],
+              'update': this.updateAmbassadors.bind(this),
+              'columnDefs': [
+                {headerName: 'ambassador', field: 'ambassador', width: 100},
+                {headerName: 'emv', field: 'emv', width: 150, cellRenderer: BaseGrid.emvRenderer}
+              ]
+            },
+            'hashtags': {
+              'options':[
+                    { label: '#apple', value: '#apple'},
+                    { label: '#banana', value: '#banana'},
+                    { label: '#cucumber', value: '#cucumber'},
+                    { label: '#dill', value :'#dill'},
+                    { label: '#egg', value :'#egg'},
+                    { label: '#fave', value: '#fave'},
+                    { label: '#giraffe', value :'#giraffe'},
+                    { label: '#magic', value :'#magic'}
+                  ],
+                'update': this.updateHashtags.bind(this),
+                'columnDefs': [
+                  {headerName: 'hashtags', field: 'hashtags', width: 100},
+                  {headerName: 'emv', field: 'emv', width: 150, cellRenderer: BaseGrid.emvRenderer}
+                ]
+              }
+        }
 
         this.state = {
             data: new MyDataFactory().createData(),
             quickFilterText: null,
-            icons: {
-                columnRemoveFromGroup: '<i class="fa fa-remove"/>',
-                filter: '<i class="fa fa-filter"/>',
-                sortAscending: '<i class="fa fa-long-arrow-down"/>',
-                sortDescending: '<i class="fa fa-long-arrow-up"/>',
-                groupExpanded: '<i class="fa fa-minus-square-o"/>',
-                groupContracted: '<i class="fa fa-plus-square-o"/>',
-                columnGroupOpened: '<i class="fa fa-minus-square-o"/>',
-                columnGroupClosed: '<i class="fa fa-plus-square-o"/>'
-            },
-            brandOptions: [
-                    { label: 'Brand X', value: 'brand x'},
-                    { label: 'Brand Y', value: 'brand y'},
-                    { label: 'Brand Z', value: 'brand z'}
-                  ],
-            brandSelection: [],
-            ambassadorSelection: [],
-            hashtagSelection: []
-        };
-
-        // the grid options are optional, because you can provide every property
-        // to the grid via standard React properties. however, the react interface
-        // doesn't block you from using the standard JavaScript interface if you
-        // wish. Maybe you have the gridOptions stored as JSON on your server? If
-        // you do, the providing the gridOptions as a standalone object is just
-        // what you want!
-        this.gridOptions = {
-            // this is how you listen for events using gridOptions
-            onModelUpdated: function() {
-                console.log('event onModelUpdated received');
-            },
-            // this is a simple property
-            rowBuffer: 10 // no need to set this, the default is fine for almost all scenarios
+            brandSelection: [''],
+            ambassadorSelection: [''],
+            hashtagsSelection: ['']
         };
     }
 
@@ -64,9 +80,18 @@ export default class MyApp extends React.Component {
     }
 
     updateBrands(values) {
-      console.log('myApp update', values)
-
+      console.log('updateBrands myApp update', values)
       this.setState({brandSelection: values})
+    }
+
+    updateAmbassadors(values) {
+      console.log('updateAmbassadors myApp update', values)
+      this.setState({ambassadorSelection: values})
+    }
+
+    updateHashtags(values) {
+      console.log('updateHashtags myApp update', values)
+      this.setState({hashtagsSelection: values})
     }
 
     render() {
@@ -83,10 +108,26 @@ export default class MyApp extends React.Component {
 
         return <div style={{width: '800px'}}>
             <div style={{padding: '4px'}}>
-                <MultiSelect label="Brand" options={this.state.brandOptions} updateBrands={this.updateBrands.bind(this)} />
-                {topHeaderTemplate}
-                <BrandGrid brandSelection={this.state.brandSelection} icons={this.state.icons} data={this.state.data} />
-            </div>
+
+              {_.map(this.dimensions, (dim, name) =>
+                <MultiSelect key={name} label={name} options={dim.options} update={dim.update} />
+              )}
+
+              {topHeaderTemplate}
+
+              {_.map(this.dimensions, (dim, name) =>
+                <BaseGrid key={name} type={name}
+                  rowFactory={new RowDataFactory(this.state.data, name, _.map(this.dimensions, (dim, name) => name))}
+                  selections={{
+                    'ambassador': this.state.ambassadorSelection,
+                    'brand': this.state.brandSelection,
+                    'hashtags': this.state.hashtagsSelection
+                  }}
+                  columnDefs={dim.columnDefs}
+                  />
+              )}
+
+          </div>
         </div>;
     }
 

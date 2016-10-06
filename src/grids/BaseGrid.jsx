@@ -12,6 +12,25 @@ export default class BrandGrid extends React.Component {
             showGrid: true,
             showToolPanel: false,
         };
+
+        var icons = {
+            columnRemoveFromGroup: '<i class="fa fa-remove"/>',
+            filter: '<i class="fa fa-filter"/>',
+            sortAscending: '<i class="fa fa-long-arrow-down"/>',
+            sortDescending: '<i class="fa fa-long-arrow-up"/>',
+            groupExpanded: '<i class="fa fa-minus-square-o"/>',
+            groupContracted: '<i class="fa fa-plus-square-o"/>',
+            columnGroupOpened: '<i class="fa fa-minus-square-o"/>',
+            columnGroupClosed: '<i class="fa fa-plus-square-o"/>'
+        }
+    }
+
+    static emvRenderer(params) {
+      if (params.value) {
+          return params.value.toFixed(2).replace(/(\d)(?=(\d{3})+\.)/g, '$1,');
+      } else {
+          return null;
+      }
     }
 
     onGridReady(params) {
@@ -45,12 +64,12 @@ export default class BrandGrid extends React.Component {
                   quickFilterText={this.state.quickFilterText}
 
                   // binding to an object property
-                  icons={this.props.icons}
+                  icons={this.icons}
 
                   // binding to array properties
                   columnDefs={this.props.columnDefs}
 
-                  rowData={this.props.rowDataFactory.createRowData(this.props.selections)}
+                  rowData={this.props.rowFactory.createRowData(this.props.selections)}
 
                   // no binding, just providing hard coded strings for the properties
                   rowSelection="multiple"

@@ -38,9 +38,7 @@ export default class MyDataFactory {
               emv: Math.random() * 10000
           })
         }
-
-        console.log(rowData[0])
-
+        
         return rowData;
     }
 }

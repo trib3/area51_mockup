@@ -15,7 +15,7 @@ export default class MultiSelect extends React.Component {
 
   handleSelectChange (value) {
 		this.setState({ value });
-		this.props.updateBrands(value.split(','))
+		this.props.update(value.split(','))
 	}
 
   render () {
@@ -24,7 +24,7 @@ export default class MultiSelect extends React.Component {
 				<h3 className="section-heading">{this.props.label}</h3>
 				<Select multi simpleValue
 					value={this.state.value}
-					placeholder={"choose " + this.props.label + "s ..."}
+					placeholder={'All ' + this.props.label}
 					options={this.props.options}
 					onChange={this.handleSelectChange.bind(this)} />
 			</div>
