@@ -3,6 +3,8 @@
 import ReactDOM from 'react-dom';
 import React from 'react';
 import MyApp from './myApp.jsx';
+import Area52 from './area52.jsx';
+
 // is there a better way of doing this?
 import 'ag-grid-root/dist/styles/ag-grid.css';
 import 'ag-grid-root/dist/styles/theme-fresh.css';
@@ -12,7 +14,7 @@ import 'ag-grid-root/dist/styles/theme-fresh.css';
 document.addEventListener('DOMContentLoaded', ()=> {
     var container = document.getElementById('myAppContainer');
     ReactDOM.render(
-        React.createElement(MyApp),
+        React.createElement(Area52),
         container
     );
 });

@@ -15,7 +15,7 @@
     "webpack": "1.12.11",
     "webpack-dev-server": "^1.14.1",
     "underscore": "1.8.3",
-    "react-select": "0.9.1"
+    "react-select": "1.0.0-rc.2"
   },
   "dependencies": {
     "ag-grid": "~6.0.1",
@@ -25,7 +25,7 @@
     "lodash": "^4.16.3",
     "react": "0.14.6",
     "react-dom": "0.14.6",
-    "react-select": "^0.9.1",
+    "react-select": "1.0.0-rc.2",
     "underscore": "1.8.3"
   }
 }
