@@ -1,3 +1,5 @@
+'use strict'
+
 import Select from 'react-select';
 import React from 'react';
 

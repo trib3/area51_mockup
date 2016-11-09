@@ -1,4 +1,5 @@
-import ReactDOM from 'react-dom';
+'use strict';
+
 import React from 'react';
 import {AgGridReact} from 'ag-grid-react';
 

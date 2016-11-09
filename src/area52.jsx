@@ -66,7 +66,12 @@ export default class Area52 extends React.Component {
             quickFilterText: null,
             brandSelection: [''],
             ambassadorSelection: [''],
-            hashtagsSelection: ['']
+            hashtagsSelection: [''],
+            brand: [''],
+            ambassador: [''],
+            hashtags: [''],
+            start_date: '2016-11-01',
+            end_date: '2016-11-08'
         };
     }
 
@@ -94,6 +99,41 @@ export default class Area52 extends React.Component {
       this.setState({hashtagsSelection: values})
     }
 
+    delimValues(selections) {
+        return _.map(selections, a => a.value).join(',')
+    }
+
+    makeQuery(dim) {
+        console.log('state', this.state)
+
+        console.log('ambs',);
+        console.log('brands', _.map(this.state.brandSelection, a=>a.value).join(','));
+
+        const q = `http://localhost:3000/api/q?` +
+                `dim=${dim}&` +
+                `start_date=${this.state.start_date}&` +
+                `end_date=${this.state.end_date}&` +
+                `ambassador_ids=${this.delimValues(this.state.ambassadorSelection)}&` +
+                `brand_ids=${this.delimValues(this.state.brandSelection)}&` +
+                `hashtags=${this.delimValues(this.state.hashtagsSelection)}&` +
+                `limit=100`;
+
+        console.log(q)
+
+        // ).then(response => {
+        //     return response.json()
+        // }).then(json => {
+        //     console.log(json);
+        //     this.setState({[dim]: json})
+        // }).catch(error => {
+        //     console.log('uh oh: ' + error.message);
+        // });
+    }
+
+    querySubmit() {
+        _.map(this.dimensions, (_, name) => this.makeQuery(name));
+    }
+
     render() {
         var topHeaderTemplate = (
             <div>
@@ -113,15 +153,19 @@ export default class Area52 extends React.Component {
                 <MultiSelect key={name} label={name} options={dim.options} update={dim.update} />
               )}
 
+              <button onClick={this.querySubmit.bind(this)}>
+                Submit
+              </button>
+
               {topHeaderTemplate}
 
               {_.map(this.dimensions, (dim, name) =>
                 <BaseGrid key={name} type={name}
                   rowFactory={new RowDataFactory(this.state.data, name, _.map(this.dimensions, (dim, name) => name))}
                   selections={{
-                    'ambassador': this.state.ambassadorSelection,
-                    'brand': this.state.brandSelection,
-                    'hashtags': this.state.hashtagsSelection
+                    'ambassador': this.state.ambassador,
+                    'brand': this.state.brand,
+                    'hashtags': this.state.hashtags
                   }}
                   columnDefs={dim.columnDefs}
                   />
