@@ -1,10 +1,6 @@
-import ReactDOM from 'react-dom';
 import React from 'react';
-import MyDataFactory from './data/MyDataFactory';
 import MultiSelect from './MultiSelect.jsx'
 import BaseGrid from './grids/BaseGrid.jsx'
-import AmbassadorGrid from './grids/AmbassadorGrid.jsx'
-import RowDataFactory from './data/RowDataFactory.js';
 
 import _ from 'underscore';
 
@@ -17,59 +13,46 @@ export default class Area52 extends React.Component {
 
         this.dimensions = {
           'brand': {
-            'options': [
-                  { label: 'Brand X', value: 'brand x'},
-                  { label: 'Brand Y', value: 'brand y'},
-                  { label: 'Brand Z', value: 'brand z'}
-                ],
             'update': this.updateBrands.bind(this),
             'columnDefs':[
-              {headerName: 'brand', field: 'brand', width: 100},
-              {headerName: 'emv', field: 'emv', width: 150, cellRenderer: BaseGrid.emvRenderer}
+              {headerName: 'brand id', field: 'brand_id', width: 100},
+              {headerName: 'brand', field: 'label', width: 100},
+              {headerName: 'emv', field: 'emv', width: 150, cellRenderer: BaseGrid.emvRenderer},
+                {headerName: 'count', field: 'count', width: 150},
+                {headerName: 'views', field: 'views', width: 150}
+
             ]
           },
           'ambassador': {
-            'options':[
-                  { label: 'Amy Zee', value: 'Amy Zee'},
-                  { label: 'Baby Yak', value: 'Baby Yak'},
-                  { label: 'Chili X', value: 'Chili X'},
-                  { label: 'Dingo Why', value :'Dingo Why'},
-                  { label: 'Ermie V', value :'Ermie V'}
-                ],
               'update': this.updateAmbassadors.bind(this),
               'columnDefs': [
-                {headerName: 'ambassador', field: 'ambassador', width: 100},
-                {headerName: 'emv', field: 'emv', width: 150, cellRenderer: BaseGrid.emvRenderer}
+                  {headerName: 'ambassador id', field: 'ambassador_id', width: 100},
+                {headerName: 'ambassador', field: 'label', width: 100},
+                {headerName: 'emv', field: 'emv', width: 150, cellRenderer: BaseGrid.emvRenderer},
+                  {headerName: 'count', field: 'count', width: 150},
+                  {headerName: 'views', field: 'views', width: 150}
+
               ]
-            },
-            'hashtags': {
-              'options':[
-                    { label: '#apple', value: '#apple'},
-                    { label: '#banana', value: '#banana'},
-                    { label: '#cucumber', value: '#cucumber'},
-                    { label: '#dill', value :'#dill'},
-                    { label: '#egg', value :'#egg'},
-                    { label: '#fave', value: '#fave'},
-                    { label: '#giraffe', value :'#giraffe'},
-                    { label: '#magic', value :'#magic'}
-                  ],
+          },
+            'hashtag': {
                 'update': this.updateHashtags.bind(this),
                 'columnDefs': [
-                  {headerName: 'hashtags', field: 'hashtags', width: 100},
-                  {headerName: 'emv', field: 'emv', width: 150, cellRenderer: BaseGrid.emvRenderer}
+                  {headerName: 'hashtag', field: 'label', width: 100},
+                  {headerName: 'emv', field: 'emv', width: 150, cellRenderer: BaseGrid.emvRenderer},
+                    {headerName: 'count', field: 'count', width: 150},
+                    {headerName: 'views', field: 'views', width: 150}
                 ]
               }
-        }
+        };
 
         this.state = {
-            data: new MyDataFactory().createData(),
             quickFilterText: null,
             brandSelection: [''],
             ambassadorSelection: [''],
-            hashtagsSelection: [''],
+            hashtagSelection: [''],
             brand: [''],
             ambassador: [''],
-            hashtags: [''],
+            hashtag: [''],
             start_date: '2016-11-01',
             end_date: '2016-11-08'
         };
@@ -85,18 +68,15 @@ export default class Area52 extends React.Component {
     }
 
     updateBrands(values) {
-      console.log('updateBrands myApp update', values)
       this.setState({brandSelection: values})
     }
 
     updateAmbassadors(values) {
-      console.log('updateAmbassadors myApp update', values)
       this.setState({ambassadorSelection: values})
     }
 
     updateHashtags(values) {
-      console.log('updateHashtags myApp update', values)
-      this.setState({hashtagsSelection: values})
+      this.setState({hashtagSelection: values})
     }
 
     delimValues(selections) {
@@ -104,31 +84,25 @@ export default class Area52 extends React.Component {
     }
 
     makeQuery(dim) {
-        console.log('state', this.state)
-
-        console.log('ambs',);
-        console.log('brands', _.map(this.state.brandSelection, a=>a.value).join(','));
-
         const q = `http://localhost:3000/api/q?` +
                 `dim=${dim}&` +
                 `start_date=${this.state.start_date}&` +
                 `end_date=${this.state.end_date}&` +
                 `ambassador_ids=${this.delimValues(this.state.ambassadorSelection)}&` +
                 `brand_ids=${this.delimValues(this.state.brandSelection)}&` +
-                `hashtags=${this.delimValues(this.state.hashtagsSelection)}&` +
+                `hashtags=${this.delimValues(this.state.hashtagSelection)}&` +
                 `limit=100`;
 
-        console.log(q)
+        console.log(q);
 
-        // ).then(response => {
-        //     return response.json()
-        // }).then(json => {
-        //     console.log(json);
-        //     this.setState({[dim]: json})
-        // }).catch(error => {
-        //     console.log('uh oh: ' + error.message);
-        // });
-    }
+        fetch(q).then(response => {
+            return response.json()
+        }).then(json => {
+            this.setState({[dim]: json})
+        }).catch(error => {
+            console.log('error: ' + error.message);
+        });
+    };
 
     querySubmit() {
         _.map(this.dimensions, (_, name) => this.makeQuery(name));
@@ -154,20 +128,15 @@ export default class Area52 extends React.Component {
               )}
 
               <button onClick={this.querySubmit.bind(this)}>
-                Submit
+                Submit Filters
               </button>
 
               {topHeaderTemplate}
 
               {_.map(this.dimensions, (dim, name) =>
                 <BaseGrid key={name} type={name}
-                  rowFactory={new RowDataFactory(this.state.data, name, _.map(this.dimensions, (dim, name) => name))}
-                  selections={{
-                    'ambassador': this.state.ambassador,
-                    'brand': this.state.brand,
-                    'hashtags': this.state.hashtags
-                  }}
                   columnDefs={dim.columnDefs}
+                  rows={this.state[name]}
                   />
               )}
 

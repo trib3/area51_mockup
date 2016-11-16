@@ -14,7 +14,7 @@ export default class BrandGrid extends React.Component {
             showToolPanel: false,
         };
 
-        var icons = {
+        this.icons = {
             columnRemoveFromGroup: '<i class="fa fa-remove"/>',
             filter: '<i class="fa fa-filter"/>',
             sortAscending: '<i class="fa fa-long-arrow-down"/>',
@@ -28,7 +28,8 @@ export default class BrandGrid extends React.Component {
 
     static emvRenderer(params) {
       if (params.value) {
-          return params.value.toFixed(2).replace(/(\d)(?=(\d{3})+\.)/g, '$1,');
+          const emv = parseInt(params.value) / 1000000;
+          return emv.toFixed(2).replace(/(\d)(?=(\d{3})+\.)/g, '$1,');
       } else {
           return null;
       }
@@ -70,7 +71,8 @@ export default class BrandGrid extends React.Component {
                   // binding to array properties
                   columnDefs={this.props.columnDefs}
 
-                  rowData={this.props.rowFactory.createRowData(this.props.selections)}
+                  // rowData={this.props.rowFactory.createRowData(this.props.selections)}
+                  rowData={this.props.rows}
 
                   // no binding, just providing hard coded strings for the properties
                   rowSelection="multiple"

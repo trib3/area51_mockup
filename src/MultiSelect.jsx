@@ -17,7 +17,6 @@ export default class MultiSelect extends React.Component {
   }
 
   handleSelectChange(value) {
-      console.log('value', value)
       this.setState({ value });
       this.props.update(value)
   }
@@ -32,7 +31,6 @@ export default class MultiSelect extends React.Component {
             console.log('boom: ' + error.message);
         });
     }
-
 
   render () {
 		return (
