@@ -1,48 +1,44 @@
 import React from 'react';
 import MultiSelect from './MultiSelect.jsx'
 import BaseGrid from './grids/BaseGrid.jsx'
+import _ from 'lodash';
 
-import _ from 'underscore';
+import {Grid, Row, Col} from 'react-flexbox-grid';
 
 import './myApp.css';
 
 export default class Area52 extends React.Component {
 
-    constructor() {
-        super();
+  constructor() {
+    super();
 
         this.dimensions = {
-          'brand': {
-            'update': this.updateBrands.bind(this),
-            'columnDefs':[
-              {headerName: 'brand id', field: 'brand_id', width: 100},
-              {headerName: 'brand', field: 'label', width: 100},
-              {headerName: 'emv', field: 'emv', width: 150, cellRenderer: BaseGrid.emvRenderer},
-                {headerName: 'count', field: 'count', width: 150},
-                {headerName: 'views', field: 'views', width: 150}
-
-            ]
-          },
-          'ambassador': {
-              'update': this.updateAmbassadors.bind(this),
-              'columnDefs': [
-                  {headerName: 'ambassador id', field: 'ambassador_id', width: 100},
-                {headerName: 'ambassador', field: 'label', width: 100},
-                {headerName: 'emv', field: 'emv', width: 150, cellRenderer: BaseGrid.emvRenderer},
-                  {headerName: 'count', field: 'count', width: 150},
-                  {headerName: 'views', field: 'views', width: 150}
-
-              ]
-          },
+            'brand': {
+                'update': this.updateBrands.bind(this),
+                'columnDefs':[
+                    {headerName: 'brand id', field: 'brand_id', width: 100},
+                    {headerName: 'brand', field: 'label', width: 100},
+                    {headerName: 'emv', field: 'emv', width: 100, cellRenderer: BaseGrid.emvRenderer},
+                    {headerName: 'count', field: 'count', width: 50},
+                ]
+            },
+            'ambassador': {
+                'update': this.updateAmbassadors.bind(this),
+                'columnDefs': [
+                    {headerName: 'ambassador id', field: 'ambassador_id', width: 100},
+                    {headerName: 'ambassador', field: 'label', width: 100},
+                    {headerName: 'emv', field: 'emv', width: 100, cellRenderer: BaseGrid.emvRenderer},
+                    {headerName: 'count', field: 'count', width: 50},
+                ]
+            },
             'hashtag': {
                 'update': this.updateHashtags.bind(this),
                 'columnDefs': [
-                  {headerName: 'hashtag', field: 'label', width: 100},
-                  {headerName: 'emv', field: 'emv', width: 150, cellRenderer: BaseGrid.emvRenderer},
-                    {headerName: 'count', field: 'count', width: 150},
-                    {headerName: 'views', field: 'views', width: 150}
+                    {headerName: 'hashtag', field: 'label', width: 100},
+                    {headerName: 'emv', field: 'emv', width: 100, cellRenderer: BaseGrid.emvRenderer},
+                    {headerName: 'count', field: 'count', width: 50},
                 ]
-              }
+            }
         };
 
         this.state = {
@@ -108,40 +104,42 @@ export default class Area52 extends React.Component {
         _.map(this.dimensions, (_, name) => this.makeQuery(name));
     }
 
-    render() {
-        var topHeaderTemplate = (
-            <div>
-                <div style={{float: 'right'}}>
-                    <input type="text" onChange={this.onQuickFilterText.bind(this)} placeholder="Type text to filter..."/>
-                </div>
-                <div style={{padding: '4px'}}>
-                    <b>Post data</b> <span id="rowCount"/>
-                </div>
-            </div>
-        );
+  render() {
+    const topHeaderTemplate = (
+      <div>
+        <div style={{float: 'right'}}>
+          <input type="text" onChange={this.onQuickFilterText.bind(this)} placeholder="Type text to filter..."/>
+        </div>
+        <div style={{padding: '4px'}}>
+          <b>Post data</b> <span id="rowCount"/>
+        </div>
+      </div>
+    );
 
-        return <div style={{width: '800px'}}>
-            <div style={{padding: '4px'}}>
+    const selectTemplates = (
+      <div key='select_templates' style={{padding: '4px'}}>
+        {_.map(this.dimensions, (dim, name) =>
+           <MultiSelect key={name} label={name} options={dim.options} update={dim.update} />
+        )}
 
-              {_.map(this.dimensions, (dim, name) =>
-                <MultiSelect key={name} label={name} options={dim.options} update={dim.update} />
-              )}
+        <button onClick={this.querySubmit.bind(this)}>
+          Submit Filters
+        </button>
+      </div>
+    );
 
-              <button onClick={this.querySubmit.bind(this)}>
-                Submit Filters
-              </button>
-
-              {topHeaderTemplate}
-
-              {_.map(this.dimensions, (dim, name) =>
-                <BaseGrid key={name} type={name}
-                  columnDefs={dim.columnDefs}
-                  rows={this.state[name]}
-                  />
-              )}
-
-          </div>
-        </div>;
+    return <Grid>
+      <Row>
+        <Col key='hi' md={1}> hi </Col>
+        <Col key='st' xs>
+          {selectTemplates}
+        </Col>
+          {_.map(this.dimensions, (dim, name) =>
+            <Col key={name} xs>
+              <BaseGrid key={name} type={name} columnDefs={dim.columnDefs} rows={this.state[name]} />
+            </Col>
+          )}
+      </Row>
+    </Grid>;
     }
-
 }
