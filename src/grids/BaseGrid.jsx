@@ -38,6 +38,7 @@ export default class BrandGrid extends React.Component {
     onGridReady(params) {
         this.api = params.api;
         this.columnApi = params.columnApi;
+        this.api.showNoRowsOverlay();
     }
 
     onQuickFilterText(event) {
@@ -49,11 +50,23 @@ export default class BrandGrid extends React.Component {
     }
 
     onRowSelected(event) {
-        console.log('onRowSelected: ' + event.node.data.name);
+        console.log('onRowSelected: ', event);
     }
 
     render() {
-        return  <div style={{height: 200}} className="ag-fresh">
+        const empty = !this.props.rows || this.props.rows.length == 0;
+
+        if (this.api) {
+            if (this.props.loading) {
+                this.api.showLoadingOverlay()
+            } else if (empty) {
+                this.api.showNoRowsOverlay()
+            } else {
+                this.api.hideOverlay()
+            }
+        }
+
+        return  <div style={{height: 300}} className="ag-fresh">
               <AgGridReact
 
                   // listening for events
