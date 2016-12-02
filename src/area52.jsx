@@ -7,6 +7,9 @@ import {Grid, Row, Col} from 'react-flexbox-grid';
 
 import './myApp.css';
 
+var ReactGridLayout = require('react-grid-layout');
+
+
 export default class Area52 extends React.Component {
 
   constructor() {
@@ -17,44 +20,54 @@ export default class Area52 extends React.Component {
                 'name': 'brand',
                 'selectable': true,
                 'row': 0,
+                'col': 1,
                 'update': this.updateBrands.bind(this),
                 'columnDefs':[
                     {headerName: 'brand id', field: 'brand_id', width: 100, hide: true},
                     {headerName: 'brand', field: 'brand', width: 100},
                     {headerName: 'emv', field: 'emv', width: 100, cellRenderer: BaseGrid.emvRenderer},
                     {headerName: 'count', field: 'count', width: 50},
-                ]
+                ],
+                'layout': {i: 'brand', x: 0, y: 0, w: 2, h: 2},
             },
             'ambassador': {
               'name': 'ambassador',
               'selectable': true,
               'row': 0,
+              'col': 2,
                 'update': this.updateAmbassadors.bind(this),
                 'columnDefs': [
                     {headerName: 'ambassador id', field: 'ambassador_id', width: 100, hide: true},
                     {headerName: 'ambassador', field: 'ambassador', width: 100},
                     {headerName: 'emv', field: 'emv', width: 100, cellRenderer: BaseGrid.emvRenderer},
                     {headerName: 'count', field: 'count', width: 50},
-                ]
+                ],
+               'layout': {i: 'ambassador', x: 0, y: 2, w: 2, h: 2},
+
+
             },
             'hashtag': {
                 'name': 'hashtag',
                 'selectable': true,
                 'row': 0,
+                 'col': 3,
                 'update': this.updateHashtags.bind(this),
                 'columnDefs': [
                     {headerName: 'hashtag', field: 'hashtag', width: 100},
                     {headerName: 'emv', field: 'emv', width: 100, cellRenderer: BaseGrid.emvRenderer},
                     {headerName: 'count', field: 'count', width: 50},
-                ]
+                ],
+                'layout': {i: 'hashtag', x: 0, y: 6, w: 2, h: 2},
+
             },
             'post': {
                 'name': 'post',
                 'selectable': false,
+                'col': 1,
                 'row': 1,
                 'columnDefs': [
                     {headerName: 'tpid', field: 'tpid', width: 100},
-                    {headerName: 'post_link', field: 'post_link', width: 100},
+                    {headerName: 'link', field: 'link', width: 100},
                     {headerName: 'brand', field: 'brand', width: 100},
                     {headerName: 'ambassador', field: 'ambassador', width: 100},
                     {headerName: 'hashtag', field: 'hashtag', width: 100},
@@ -136,41 +149,34 @@ export default class Area52 extends React.Component {
     }
 
   render() {
+    return (
+      <ReactGridLayout className="layout" cols={12} rowHeight={30} width={1200}>
 
-    const selectTemplates = (
-      <div key='select_templates' style={{padding: '4px'}}>
-        {_.chain(this.dimensions).filter(({'selectable': true})).map((dim) =>
-           <MultiSelect key={dim.name} label={dim.name} options={dim.options} update={dim.update} />
-        ).value()}
-        <div style={{padding: '4px'}}>
-          <button onClick={this.querySubmit.bind(this)}>
-            Submit Filters
-          </button>
-        </div>
-      </div>
-    );
+        <div key='optionsList' data-grid={{x:0, y:0, h:9, w:2}} style={{padding: '4px'}}>
 
-
-    return <Grid>
-      <Row>
-        <Col key='st' xs>
-          {selectTemplates}
-        </Col>
-          {_.chain(this.dimensions).filter(({'row':0})).map((dim) =>
-              <Col key={dim.name} xs>
-                <h2>{dim.name}</h2>
-                <BaseGrid key={dim.name} type={dim.name} columnDefs={dim.columnDefs} rows={this.state[dim.name]}
-                          loading={this.state[dim.name + 'Loading']}/>
-              </Col>
+          {/* filter option dropdown s*/}
+          {_.chain(this.dimensions).filter(({'selectable': true})).map((dim) =>
+             <MultiSelect key={dim.name} label={dim.name} options={dim.options} update={dim.update} />
           ).value()}
-      </Row>
-      <Row>
-        <Col key="post_col" xs>
-          <h2>posts</h2>
-          <BaseGrid key="post" type="post" columnDefs={this.dimensions.post.columnDefs} rows={this.state.post}
-                        loading={this.state.postLoading} />
-        </Col>
-      </Row>
-    </Grid>
+
+          {/* options submit button s*/}
+          <div style={{padding: '4px'}}>
+            <button onClick={this.querySubmit.bind(this)}>
+              Submit Filters
+            </button>
+          </div>
+        </div>
+
+        {/* tables */}
+        {_.chain(this.dimensions).map((dim) =>
+            <div key={dim.name} data-grid={{x:(dim.col*2), y:(dim.row*8), h:9, w:2}}>
+              <h2>{dim.name}</h2>
+              <BaseGrid key={dim.name} type={dim.name} columnDefs={dim.columnDefs} rows={this.state[dim.name]}
+                        loading={this.state[dim.name + 'Loading']}/>
+            </div>
+        ).value()}
+
+      </ReactGridLayout>
+    )
   }
 }

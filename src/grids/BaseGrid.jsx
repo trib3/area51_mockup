@@ -50,7 +50,10 @@ export default class BrandGrid extends React.Component {
     }
 
     onRowSelected(event) {
-        console.log('onRowSelected: ', event);
+        const link = event.node.data.link;
+        if (link) {
+            window.open(link)
+        }
     }
 
     render() {

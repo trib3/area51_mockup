@@ -9,13 +9,13 @@ module.exports = {
             {
                 test: /\.css$/,
                 loader: 'style!css',
-                exclude: /flexboxgrid/,
+               //exclude: /flexboxgrid/,
             },
-                         {
-                test: /\.css$/,
-                loader: 'style!css?modules',
-                include: /flexboxgrid/,
-            },
+            //              {
+            //     test: /\.css$/,
+            //     loader: 'style!css?modules',
+            //     include: /flexboxgrid/,
+            // },
             {
                 test: /\.js$|\.jsx$/,
                 loader: 'babel-loader',
