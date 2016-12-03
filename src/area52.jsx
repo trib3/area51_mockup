@@ -3,12 +3,12 @@ import MultiSelect from './MultiSelect.jsx'
 import BaseGrid from './grids/BaseGrid.jsx'
 import _ from 'lodash';
 
-import {Grid, Row, Col} from 'react-flexbox-grid';
-
+import DateSelector from './DateSelector.jsx'
 import './myApp.css';
 
 var ReactGridLayout = require('react-grid-layout');
 
+import moment from 'moment';
 
 export default class Area52 extends React.Component {
 
@@ -23,7 +23,7 @@ export default class Area52 extends React.Component {
                 'col': 1,
                 'update': this.updateBrands.bind(this),
                 'columnDefs':[
-                    {headerName: 'brand id', field: 'brand_id', width: 100, hide: true},
+                    {headerName: 'brand id', field: 'brand_id', width: 100, hide: false},
                     {headerName: 'brand', field: 'brand', width: 100},
                     {headerName: 'emv', field: 'emv', width: 100, cellRenderer: BaseGrid.emvRenderer},
                     {headerName: 'count', field: 'count', width: 50},
@@ -37,14 +37,12 @@ export default class Area52 extends React.Component {
               'col': 2,
                 'update': this.updateAmbassadors.bind(this),
                 'columnDefs': [
-                    {headerName: 'ambassador id', field: 'ambassador_id', width: 100, hide: true},
+                    {headerName: 'ambassador id', field: 'ambassador_id', width: 100, hide: false},
                     {headerName: 'ambassador', field: 'ambassador', width: 100},
                     {headerName: 'emv', field: 'emv', width: 100, cellRenderer: BaseGrid.emvRenderer},
                     {headerName: 'count', field: 'count', width: 50},
                 ],
                'layout': {i: 'ambassador', x: 0, y: 2, w: 2, h: 2},
-
-
             },
             'hashtag': {
                 'name': 'hashtag',
@@ -66,7 +64,8 @@ export default class Area52 extends React.Component {
                 'col': 1,
                 'row': 1,
                 'columnDefs': [
-                    {headerName: 'tpid', field: 'tpid', width: 100},
+                    {headerName: 'tpid', field: 'tpid', width: 100, hide: false},
+                    {headerName: 'publish time', field: 'publish_time', width: 100},
                     {headerName: 'link', field: 'link', width: 100},
                     {headerName: 'brand', field: 'brand', width: 100},
                     {headerName: 'ambassador', field: 'ambassador', width: 100},
@@ -84,8 +83,8 @@ export default class Area52 extends React.Component {
             brand: null,
             ambassador: null,
             hashtag: null,
-            start_date: '2016-11-01',
-            end_date: '2016-12-01',
+            startDate: moment().subtract(30, 'days'),
+            endDate:  moment(),
             brandLoading: false,
             ambassadorLoading: false,
             hashtagLoading: false,
@@ -116,8 +115,8 @@ export default class Area52 extends React.Component {
     makeQuery(dim) {
         const q = `http://localhost:3000/api/q?` +
                 `dim=${dim}&` +
-                `start_date=${this.state.start_date}&` +
-                `end_date=${this.state.end_date}&` +
+                `start_date=${this.state.startDate.format('YYYY-MM-DD')}&` +
+                `end_date=${this.state.endDate.format('YYYY-MM-DD')}&` +
                 `ambassador_ids=${this.delimValues(this.state.ambassadorSelection)}&` +
                 `brand_ids=${this.delimValues(this.state.brandSelection)}&` +
                 `hashtags=${this.delimValues(this.state.hashtagSelection)}&` +
@@ -130,8 +129,6 @@ export default class Area52 extends React.Component {
         }).then(json => {
             this.setState({[dim+'Loading']: false});
             this.setState({[dim]: json});
-
-            console.log('received rows', dim, json.length)
         }).catch(error => {
             this.setState({[dim+'Loading']: false});
             console.log('error: ' + error.message);
@@ -148,11 +145,23 @@ export default class Area52 extends React.Component {
         });
     }
 
+    dateChange(startDate, endDate) {
+      this.setState({startDate: startDate, endDate: endDate});
+    }
+
   render() {
+
     return (
+      <div>
+
       <ReactGridLayout className="layout" cols={12} rowHeight={30} width={1200}>
 
-        <div key='optionsList' data-grid={{x:0, y:0, h:9, w:2}} style={{padding: '4px'}}>
+        <div key='dateSelector' data-grid={{x:0, y:0, h:3, w:2}} style={{padding: '4px'}}>
+          <DateSelector initStartDate={this.state.startDate}
+                    initEndDate={this.state.endDate}
+                    update={this.dateChange.bind(this)}/>
+        </div>
+        <div key='optionsList' data-grid={{x:0, y:3, h:9, w:2}} style={{padding: '4px'}}>
 
           {/* filter option dropdown s*/}
           {_.chain(this.dimensions).filter(({'selectable': true})).map((dim) =>
@@ -177,6 +186,7 @@ export default class Area52 extends React.Component {
         ).value()}
 
       </ReactGridLayout>
+      </div>
     )
   }
 }
