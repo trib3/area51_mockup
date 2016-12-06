@@ -26,11 +26,13 @@
     "ag-grid": "~6.0.1",
     "ag-grid-enterprise": "~6.0.1",
     "ag-grid-react": "~6.0.1",
+    "babel-plugin-add-module-exports": "^0.2.1",
     "classnames": "^2.2.5",
     "lodash": "^4.17.2",
     "rc-calendar": "^7.5.1",
-    "react": "^0.14.6",
-    "react-dom": "^0.14.6",
+    "react": "^15.4.1",
+    "react-d3-basic": "^1.6.11",
+    "react-dom": "^15.4.1",
     "react-select": "^1.0.0-rc.2"
   }
 }

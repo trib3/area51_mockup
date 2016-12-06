@@ -4,9 +4,13 @@ import BaseGrid from './grids/BaseGrid.jsx'
 import _ from 'lodash';
 
 import DateSelector from './DateSelector.jsx'
+import DailyChart from './charts/DailyChart.jsx'
+
 import './myApp.css';
 
 var ReactGridLayout = require('react-grid-layout');
+
+
 
 import moment from 'moment';
 
@@ -88,7 +92,8 @@ export default class Area52 extends React.Component {
             brandLoading: false,
             ambassadorLoading: false,
             hashtagLoading: false,
-            postLoading: false
+            postLoading: false,
+            time: []
         };
     }
 
@@ -112,7 +117,7 @@ export default class Area52 extends React.Component {
       return encodeURIComponent(_.map(selections, a => a.value).join(','));
     }
 
-    makeQuery(dim) {
+    makeQuery(dim, limit = 20) {
         const q = `http://localhost:3000/api/q?` +
                 `dim=${dim}&` +
                 `start_date=${this.state.startDate.format('YYYY-MM-DD')}&` +
@@ -120,7 +125,7 @@ export default class Area52 extends React.Component {
                 `ambassador_ids=${this.delimValues(this.state.ambassadorSelection)}&` +
                 `brand_ids=${this.delimValues(this.state.brandSelection)}&` +
                 `hashtags=${this.delimValues(this.state.hashtagSelection)}&` +
-                `limit=20`;
+                `limit=${limit}`;
 
         console.log(q);
 
@@ -143,6 +148,8 @@ export default class Area52 extends React.Component {
           // make the queries
           this.makeQuery(name)
         });
+
+        this.makeQuery('time', 1000)
     }
 
     dateChange(startDate, endDate) {
@@ -151,17 +158,22 @@ export default class Area52 extends React.Component {
 
   render() {
 
-    return (
-      <div>
+    const chartHeight = 4
 
+
+    return (
       <ReactGridLayout className="layout" cols={12} rowHeight={30} width={1200}>
 
-        <div key='dateSelector' data-grid={{x:0, y:0, h:3, w:2}} style={{padding: '4px'}}>
+        <div key='daily_chart' data-grid={{x:2, y:0, h:chartHeight, w:5}}>
+          <DailyChart data={this.state.time}/>
+        </div>
+
+        <div key='dateSelector' data-grid={{x:0, y:0, h:chartHeight, w:2}} style={{padding: '4px'}}>
           <DateSelector initStartDate={this.state.startDate}
                     initEndDate={this.state.endDate}
                     update={this.dateChange.bind(this)}/>
         </div>
-        <div key='optionsList' data-grid={{x:0, y:3, h:9, w:2}} style={{padding: '4px'}}>
+        <div key='optionsList' data-grid={{x:0, y:chartHeight, h:9, w:2}} style={{padding: '4px'}}>
 
           {/* filter option dropdown s*/}
           {_.chain(this.dimensions).filter(({'selectable': true})).map((dim) =>
@@ -178,7 +190,7 @@ export default class Area52 extends React.Component {
 
         {/* tables */}
         {_.chain(this.dimensions).map((dim) =>
-            <div key={dim.name} data-grid={{x:(dim.col*2), y:(dim.row*8), h:9, w:2}}>
+            <div key={dim.name} data-grid={{x:(dim.col*2), y:(chartHeight + dim.row*8), h:9, w:2}}>
               <h2>{dim.name}</h2>
               <BaseGrid key={dim.name} type={dim.name} columnDefs={dim.columnDefs} rows={this.state[dim.name]}
                         loading={this.state[dim.name + 'Loading']}/>
@@ -186,7 +198,6 @@ export default class Area52 extends React.Component {
         ).value()}
 
       </ReactGridLayout>
-      </div>
     )
   }
 }
